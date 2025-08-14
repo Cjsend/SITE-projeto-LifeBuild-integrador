@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rotinas</title>
+  <meta name="description" content="App de rotinas com visual inspirado no Asana, feito com HTML, CSS e JS separados." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script defer src="java.js"></script>
+</head>
+<body>
+  <div class="app" data-layout="with-sidebar" data-theme="light">
+
+    <!-- Barra superior -->
+    <header class="topbar" role="banner">
+      <button class="btn icon only" aria-label="Alternar menu" id="btnToggleSidebar" title="Abrir/fechar menu">
+        <span class="icon" aria-hidden="true">☰</span>
+      </button>
+
+      <a href="#" class="brand" aria-label="Página inicial">
+        <span class="brand-mark" aria-hidden="true">✔</span>
+        <span class="brand-name">Life build</span>
+      </a>
+
+      <form class="search" role="search" aria-label="Buscar">
+        <input type="search" id="searchInput" placeholder="Buscar rotinas, tarefas, etiquetas..." autocomplete="off" />
+        <button class="btn icon only" aria-label="Buscar" title="Buscar">
+          <span class="icon" aria-hidden="true">🔎</span>
+        </button>
+      </form>
+
+      <div class="spacer"></div>
+
+      <div class="now" aria-live="polite">
+        <span id="todayDate" class="date">--/--/----</span>
+        <span id="nowTime" class="time">--:--</span>
+      </div>
+
+      <nav class="top-actions" aria-label="Ações rápidas">
+        <button class="btn ghost" id="btnQuickAdd" aria-haspopup="dialog">+ Nova rotina</button>
+        <button class="btn ghost" id="btnToggleTheme" aria-pressed="false">🌓</button>
+        <div class="profile" id="profileMenu" aria-haspopup="menu">
+          <button class="avatar" aria-label="Abrir menu do usuário">
+            <img src="https://i.pravatar.cc/40?img=12" alt="Avatar do usuário" />
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Layout com sidebar + conteúdo principal -->
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+        <section class="section">
+          <h2 class="section-title">Visão Geral</h2>
+          <ul class="menu" role="list">
+            <li><a class="menu-link is-active" href="#viewHoje" data-view="hoje">Hoje</a></li>
+            <li><a class="menu-link" href="#viewSemana" data-view="semana">Próximos 7 dias</a></li>
+            <li><a class="menu-link" href="#viewTodas" data-view="todas">Todas as rotinas</a></li>
+            <li><a class="menu-link" href="#viewCalendario" data-view="calendario">Calendário</a></li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Etiquetas</h2>
+          <ul class="tags" role="list" id="tagList">
+            <li><a class="tag" href="#" data-tag="pessoal">#pessoal</a></li>
+            <li><a class="tag" href="#" data-tag="trabalho">#trabalho</a></li>
+            <li><a class="tag" href="#" data-tag="saude">#saúde</a></li>
+            <li><a class="tag" href="#" data-tag="estudos">#estudos</a></li>
+          </ul>
+          <button class="btn small" id="btnAddTag">+ Nova etiqueta</button>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Filtros</h2>
+          <ul class="menu" role="list">
+            <li><a class="menu-link" href="#" data-filter="pendentes">Pendentes</a></li>
+            <li><a class="menu-link" href="#" data-filter="concluidas">Concluídas</a></li>
+            <li><a class="menu-link" href="#" data-filter="alta">Prioridade alta</a></li>
+            <li><a class="menu-link" href="#" data-filter="semData">Sem data</a></li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Preferências</h2>
+          <div class="pref-group">
+            <label class="switch">
+              <input type="checkbox" id="prefCompact" />
+              <span>Modo compacto</span>
+            </label>
+          </div>
+          <div class="pref-group">
+            <label class="switch">
+              <input type="checkbox" id="prefShowCompleted" checked />
+              <span>Mostrar concluídas</span>
+            </label>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Conteúdo principal -->
+      <main class="main" id="mainContent" role="main">
+        <!-- Barra de ferramentas da visão -->
+        <div class="view-toolbar" role="region" aria-label="Ferramentas da visão">
+          <div class="left">
+            <h1 class="view-title" id="viewTitle">Hoje</h1>
+            <div class="breadcrumbs" aria-label="Navegação">
+              <span>Início</span>
+              <span aria-hidden="true">›</span>
+              <span id="crumbView">Hoje</span>
+            </div>
+          </div>
+          <div class="right">
+            <div class="view-switch" role="tablist" aria-label="Trocar visualização">
+              <button role="tab" class="tab is-active" data-viewmode="lista" aria-selected="true">Lista</button>
+              <button role="tab" class="tab" data-viewmode="quadro">Quadro</button>
+              <button role="tab" class="tab" data-viewmode="calendario">Calendário</button>
+            </div>
+            <div class="controls">
+              <button class="btn" id="btnAddRoutineTop">+ Nova rotina</button>
+              <button class="btn ghost" id="btnSort">Ordenar</button>
+              <button class="btn ghost" id="btnFilter">Filtros</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualização: LISTA -->
+        <section class="view is-active" id="viewLista" data-viewmode="lista" aria-labelledby="viewTitle">
+          <ul class="task-list" id="taskListToday" role="list">
+            <!-- Itens serão preenchidos pelo JavaScript -->
+          </ul>
+        </section>
+
+        <!-- Visualização: QUADRO -->
+        <section class="view" id="viewQuadro" data-viewmode="quadro" aria-labelledby="viewTitle">
+          <div class="board" role="region" aria-label="Quadro de tarefas">
+            <div class="column" data-col="todo" aria-label="A fazer">
+              <header class="column-header">
+                <h2>A fazer</h2>
+                <button class="btn small ghost" data-add-to="todo">+ Adicionar</button>
+              </header>
+              <ul class="card-list" role="list" aria-describedby="todoCount"></ul>
+              <div id="todoCount" class="count" aria-live="polite">0 itens</div>
+            </div>
+            <div class="column" data-col="doing" aria-label="Em progresso">
+              <header class="column-header">
+                <h2>Em progresso</h2>
+                <button class="btn small ghost" data-add-to="doing">+ Adicionar</button>
+              </header>
+              <ul class="card-list" role="list" aria-describedby="doingCount"></ul>
+              <div id="doingCount" class="count" aria-live="polite">0 itens</div>
+            </div>
+            <div class="column" data-col="done" aria-label="Concluído">
+              <header class="column-header">
+                <h2>Concluído</h2>
+                <button class="btn small ghost" data-add-to="done">+ Adicionar</button>
+              </header>
+              <ul class="card-list" role="list" aria-describedby="doneCount"></ul>
+              <div id="doneCount" class="count" aria-live="polite">0 itens</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Visualização: CALENDÁRIO -->
+        <section class="view" id="viewCalendario" data-viewmode="calendario" aria-labelledby="viewTitle">
+          <div class="calendar-toolbar">
+            <button class="btn ghost" id="calPrev" aria-label="Mês anterior">‹</button>
+            <div class="calendar-title" id="calTitle">Mês Atual</div>
+            <button class="btn ghost" id="calNext" aria-label="Próximo mês">›</button>
+            <div class="spacer"></div>
+            <button class="btn" id="calToday">Hoje</button>
+          </div>
+          <div class="calendar-grid" role="grid" aria-readonly="true" aria-label="Calendário de rotinas">
+            <!-- O JS preencherá os dias e tarefas -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Painel lateral de detalhes da tarefa -->
+    <aside class="details" id="detailsPanel" aria-label="Detalhes da rotina" aria-hidden="true">
+      <header class="details-header">
+        <h2 id="detailsTitle">Detalhes</h2>
+        <button class="btn icon only" id="detailsClose" aria-label="Fechar">✕</button>
+      </header>
+      <div class="details-body">
+        <form class="details-form" id="detailsForm">
+          <label class="field">
+            <span>Título</span>
+            <input type="text" id="taskTitle" placeholder="Nome da rotina" required />
+          </label>
+          <label class="field">
+            <span>Descrição</span>
+            <textarea id="taskDesc" rows="6" placeholder="Detalhes, comentários, notas..."></textarea>
+          </label>
+          <div class="grid two">
+            <label class="field">
+              <span>Data</span>
+              <input type="date" id="taskDate" />
+            </label>
+            <label class="field">
+              <span>Hora</span>
+              <input type="time" id="taskTime" />
+            </label>
+          </div>
+          <div class="grid two">
+            <label class="field">
+              <span>Prioridade</span>
+              <select id="taskPriority">
+                <option value="low">Baixa</option>
+                <option value="medium" selected>Média</option>
+                <option value="high">Alta</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Etiqueta</span>
+              <input type="text" id="taskTag" list="datalistTags" placeholder="#pessoal, #trabalho" />
+              <datalist id="datalistTags">
+                <option value="#pessoal"></option>
+                <option value="#trabalho"></option>
+                <option value="#saúde"></option>
+                <option value="#estudos"></option>
+              </datalist>
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn danger ghost" id="btnDeleteTask">Excluir</button>
+            <div class="spacer"></div>
+            <button type="button" class="btn ghost" id="btnDuplicateTask">Duplicar</button>
+            <button type="submit" class="btn" id="btnSaveTask">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Modal: Nova rotina rápida -->
+    <dialog class="modal" id="modalQuickAdd" aria-labelledby="modalQuickAddTitle" aria-modal="true">
+      <form method="dialog" class="modal-content" id="quickAddForm">
+        <header class="modal-header">
+          <h2 id="modalQuickAddTitle">Adicionar rotina</h2>
+          <button class="btn icon only" value="cancel" aria-label="Fechar">✕</button>
+        </header>
+        <div class="modal-body">
+          <label class="field">
+            <span>Título</span>
+            <input type="text" id="quickTitle" placeholder="Ex.: Treino de manhã" required />
+          </label>
+          <div class="grid two">
+            <label class="field">
+              <span>Data</span>
+              <input type="date" id="quickDate" />
+            </label>
+            <label class="field">
+              <span>Prioridade</span>
+              <select id="quickPriority">
+                <option value="low">Baixa</option>
+                <option value="medium" selected>Média</option>
+                <option value="high">Alta</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            <span>Etiqueta</span>
+            <input type="text" id="quickTag" placeholder="#pessoal" />
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn ghost" value="cancel">Cancelar</button>
+          <button class="btn" value="confirm">Adicionar</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Modal: Nova etiqueta -->
+    <dialog class="modal small" id="modalAddTag" aria-labelledby="modalAddTagTitle" aria-modal="true">
+      <form method="dialog" class="modal-content" id="addTagForm">
+        <header class="modal-header">
+          <h2 id="modalAddTagTitle">Nova etiqueta</h2>
+          <button class="btn icon only" value="cancel" aria-label="Fechar">✕</button>
+        </header>
+        <div class="modal-body">
+          <label class="field">
+            <span>Nome da etiqueta</span>
+            <input type="text" id="tagName" placeholder="Ex.: fitness" required />
+          </label>
+          <label class="field">
+            <span>Cor</span>
+            <input type="color" id="tagColor" value="#4f46e5" />
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button class="btn ghost" value="cancel">Cancelar</button>
+          <button class="btn" value="confirm">Adicionar</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Toasts/Notificações -->
+    <div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Rodapé -->
+    <footer class="footer" role="contentinfo">
+      <small>NCDRP - 2025.</small>
+    </footer>
+  </div>
+
+  <!-- Templates para o JavaScript -->
+  <template id="tplTaskItem">
+    <li class="task" draggable="true">
+      <label class="checkbox">
+        <input type="checkbox" />
+        <span class="check"></span>
+      </label>
+      <div class="task-main">
+        <div class="task-title">Nova rotina</div>
+        <div class="task-meta">
+          <span class="due">Sem data</span>
+          <span class="priority medium">Média</span>
+          <span class="tag">#geral</span>
+        </div>
+      </div>
+      <button class="btn icon only task-open" aria-label="Abrir detalhes">›</button>
+    </li>
+  </template>
+
+  <template id="tplBoardCard">
+    <li class="card" draggable="true">
+      <header class="card-head">
+        <span class="status" aria-hidden="true"></span>
+        <h3 class="card-title">Nova tarefa</h3>
+      </header>
+      <div class="card-meta">
+        <span class="due">Sem data</span>
+        <span class="priority medium">Média</span>
+        <span class="tag">#geral</span>
+      </div>
+      <footer class="card-actions">
+        <button class="btn tiny ghost">Detalhes</button>
+        <button class="btn tiny ghost">Concluir</button>
+      </footer>
+    </li>
+  </template>
+
+  <template id="tplToast">
+    <div class="toast">
+      <div class="toast-content"></div>
+      <button class="btn icon only toast-close" aria-label="Fechar">✕</button>
+    </div>
+  </template>
+</body>
+</html>
