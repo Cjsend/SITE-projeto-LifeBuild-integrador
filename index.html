@@ -24,23 +24,15 @@
         <span class="brand-name">Life build</span>
       </a>
 
-      <form class="search" role="search" aria-label="Buscar">
-        <input type="search" id="searchInput" placeholder="Buscar rotinas, tarefas, etiquetas..." autocomplete="off" />
-        <button class="btn icon only" aria-label="Buscar" title="Buscar">
-          <span class="icon" aria-hidden="true">🔎</span>
-        </button>
-      </form>
-
+  
       <div class="spacer"></div>
-
-      <div class="now" aria-live="polite">
-        <span id="todayDate" class="date">--/--/----</span>
-        <span id="nowTime" class="time">--:--</span>
+        <div class="now" aria-live="polite">
+          <span id="todayDate" class="date">--/--/----</span>
+          <span id="nowTime" class="time">--:--</span>
       </div>
 
       <nav class="top-actions" aria-label="Ações rápidas">
         <button class="btn ghost" id="btnQuickAdd" aria-haspopup="dialog">+ Nova rotina</button>
-        <button class="btn ghost" id="btnToggleTheme" aria-pressed="false">🌓</button>
         <div class="profile" id="profileMenu" aria-haspopup="menu">
           <button class="avatar" aria-label="Abrir menu do usuário">
             <img src="https://i.pravatar.cc/40?img=12" alt="Avatar do usuário" />
@@ -58,7 +50,6 @@
           <ul class="menu" role="list">
             <li><a class="menu-link is-active" href="#viewHoje" data-view="hoje">Hoje</a></li>
             <li><a class="menu-link" href="#viewSemana" data-view="semana">Próximos 7 dias</a></li>
-            <li><a class="menu-link" href="#viewTodas" data-view="todas">Todas as rotinas</a></li>
             <li><a class="menu-link" href="#viewCalendario" data-view="calendario">Calendário</a></li>
           </ul>
         </section>
@@ -84,22 +75,6 @@
           </ul>
         </section>
 
-        <section class="section">
-          <h2 class="section-title">Preferências</h2>
-          <div class="pref-group">
-            <label class="switch">
-              <input type="checkbox" id="prefCompact" />
-              <span>Modo compacto</span>
-            </label>
-          </div>
-          <div class="pref-group">
-            <label class="switch">
-              <input type="checkbox" id="prefShowCompleted" checked />
-              <span>Mostrar concluídas</span>
-            </label>
-          </div>
-        </section>
-      </aside>
 
       <!-- Conteúdo principal -->
       <main class="main" id="mainContent" role="main">
